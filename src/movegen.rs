@@ -26,6 +26,7 @@ const BISHOP_DIRS: [(i8, i8); 4] = [(-1, -1), (-1, 1), (1, -1), (1, 1)];
 const ROOK_DIRS: [(i8, i8); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
 
 pub fn generate_legal_moves(board: &Board) -> Vec<Move> {
+    // Generate pseudo-legal moves first, then filter out those that leave own king in check.
     let pseudo = generate_pseudo_legal_moves(board);
     let mut legal = Vec::with_capacity(pseudo.len());
     for mv in pseudo {
@@ -79,6 +80,7 @@ pub fn is_square_attacked(board: &Board, sq: u8, by_color: Color) -> bool {
         }
     }
 
+    // Sliding attacks stop at the first occupied square in each direction.
     for (df, dr) in BISHOP_DIRS {
         if ray_attacked(
             board,
@@ -110,6 +112,7 @@ pub fn is_square_attacked(board: &Board, sq: u8, by_color: Color) -> bool {
 }
 
 pub fn perft(board: &Board, depth: u32) -> u64 {
+    // Performance test: counts legal leaf nodes, useful for movegen validation.
     if depth == 0 {
         return 1;
     }
@@ -165,6 +168,7 @@ fn generate_pawn_moves(board: &Board, from: u8, color: Color, out: &mut Vec<Move
         Color::Black => (-1_i8, 6_i8, 1_i8),
     };
 
+    // Forward pushes (including promotion and initial two-square push).
     if let Some(one_step) = from_coord(file, rank + step) {
         if board.piece_at(one_step).is_none() {
             if rank == promo_rank {
@@ -207,6 +211,7 @@ fn generate_pawn_moves(board: &Board, from: u8, color: Color, out: &mut Vec<Move
         }
     }
 
+    // Diagonal captures (including promotions and en-passant).
     for df in [-1_i8, 1_i8] {
         if let Some(target) = from_coord(file + df, rank + step) {
             if let Some(captured) = board.piece_at(target) {
@@ -280,6 +285,7 @@ fn generate_slider_moves(
     out: &mut Vec<Move>,
 ) {
     let (file, rank) = to_coord(from);
+    // Walk ray by ray until edge or first blocker.
     for &(df, dr) in dirs {
         let mut f = file + df;
         let mut r = rank + dr;
@@ -312,6 +318,7 @@ fn generate_slider_moves(
 fn generate_king_moves(board: &Board, from: u8, color: Color, out: &mut Vec<Move>) {
     generate_jumper_moves(board, from, color, &KING_DELTAS, out);
 
+    // Castling is only legal when not in check and all crossed squares are safe.
     if in_check(board, color) {
         return;
     }
@@ -391,6 +398,7 @@ fn ray_attacked(
     by_color: Color,
     valid_kinds: &[PieceKind],
 ) -> bool {
+    // Scan outward and accept only the first piece if it is an allowed attacker.
     let mut f = file + df;
     let mut r = rank + dr;
     while let Some(sq) = from_coord(f, r) {

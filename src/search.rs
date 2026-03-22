@@ -1,3 +1,7 @@
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
+use std::sync::mpsc;
+use std::thread;
 use std::time::{Duration, Instant};
 
 use crate::board::{Board, Color, Move, PieceKind};
@@ -27,39 +31,41 @@ pub struct SearchResult {
 }
 
 pub struct Searcher {
-    start: Instant,
-    stop_at: Option<Instant>,
-    nodes: u64,
-    aborted: bool,
+    threads: usize,
 }
 
 impl Searcher {
     pub fn new() -> Self {
         Self {
-            start: Instant::now(),
-            stop_at: None,
-            nodes: 0,
-            aborted: false,
+            threads: thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(1),
         }
     }
 
+    pub fn threads(&self) -> usize {
+        self.threads
+    }
+
+    pub fn set_threads(&mut self, threads: usize) {
+        self.threads = threads.max(1);
+    }
+
     pub fn iterative_deepening(&mut self, board: &Board, limits: SearchLimits) -> SearchResult {
-        self.start = Instant::now();
-        self.nodes = 0;
-        self.aborted = false;
-        self.stop_at = compute_stop_time(board.side_to_move, limits).map(|d| self.start + d);
+        let start = Instant::now();
+        let ctx = SearchCtx {
+            stop_at: compute_stop_time(board.side_to_move, limits).map(|d| start + d),
+            aborted: AtomicBool::new(false),
+            nodes: AtomicU64::new(0),
+        };
 
         let max_depth = limits.depth.unwrap_or(6);
         let mut best_move = None;
         let mut best_score = 0;
         let mut last_completed_depth = 0;
 
+        // Iterative deepening: progressively search deeper and keep last complete result.
         for depth in 1..=max_depth {
-            let mut alpha = -INF;
-            let beta = INF;
-            let mut depth_best_move = None;
-            let mut depth_best_score = -INF;
-
             let mut root_moves = generate_legal_moves(board);
             order_moves(board, &mut root_moves);
 
@@ -67,35 +73,19 @@ impl Searcher {
                 break;
             }
 
-            for mv in root_moves {
-                if self.should_stop() {
-                    self.aborted = true;
-                    break;
-                }
-                let Some(next) = board.apply_move(mv) else {
-                    continue;
-                };
-                let score = -self.negamax(&next, depth - 1, -beta, -alpha, 1);
-                if score > depth_best_score {
-                    depth_best_score = score;
-                    depth_best_move = Some(mv);
-                }
-                if score > alpha {
-                    alpha = score;
-                }
-            }
-
-            if !self.aborted {
-                if let Some(mv) = depth_best_move {
+            if !ctx.aborted.load(Ordering::Relaxed) {
+                if let Some((mv, score)) =
+                    self.search_root_parallel(board, &root_moves, depth, &ctx)
+                {
                     best_move = Some(mv);
-                    best_score = depth_best_score;
+                    best_score = score;
                     last_completed_depth = depth;
-                    let elapsed = self.start.elapsed().as_millis();
+                    let elapsed = start.elapsed().as_millis();
                     println!(
                         "info depth {} score cp {} nodes {} time {} pv {}",
                         depth,
                         best_score,
-                        self.nodes,
+                        ctx.nodes.load(Ordering::Relaxed),
                         elapsed,
                         mv.to_uci()
                     );
@@ -109,59 +99,121 @@ impl Searcher {
             best_move,
             score_cp: best_score,
             depth: last_completed_depth,
-            nodes: self.nodes,
-            elapsed_ms: self.start.elapsed().as_millis(),
+            nodes: ctx.nodes.load(Ordering::Relaxed),
+            elapsed_ms: start.elapsed().as_millis(),
         }
     }
 
-    fn negamax(&mut self, board: &Board, depth: u32, mut alpha: i32, beta: i32, ply: i32) -> i32 {
-        if self.should_stop() {
-            self.aborted = true;
+    fn search_root_parallel(
+        &self,
+        board: &Board,
+        root_moves: &[Move],
+        depth: u32,
+        ctx: &SearchCtx,
+    ) -> Option<(Move, i32)> {
+        let workers = self.threads.min(root_moves.len()).max(1);
+        let next_index = Arc::new(AtomicUsize::new(0));
+        let (tx, rx) = mpsc::channel::<(usize, Move, i32)>();
+
+        thread::scope(|scope| {
+            for _ in 0..workers {
+                let tx = tx.clone();
+                let next_index = Arc::clone(&next_index);
+                scope.spawn(move || {
+                    loop {
+                        if ctx.aborted.load(Ordering::Relaxed) {
+                            break;
+                        }
+                        let idx = next_index.fetch_add(1, Ordering::Relaxed);
+                        if idx >= root_moves.len() {
+                            break;
+                        }
+                        let mv = root_moves[idx];
+                        let Some(next_board) = board.apply_move(mv) else {
+                            continue;
+                        };
+                        let score = -negamax(&next_board, depth - 1, -INF, INF, 1, ctx);
+                        let _ = tx.send((idx, mv, score));
+                    }
+                });
+            }
+            drop(tx);
+        });
+
+        let mut best: Option<(usize, Move, i32)> = None;
+        for (idx, mv, score) in rx {
+            match best {
+                Some((best_idx, _, best_score)) => {
+                    // Stable tie-break by move order to keep output deterministic-ish.
+                    if score > best_score || (score == best_score && idx < best_idx) {
+                        best = Some((idx, mv, score));
+                    }
+                }
+                None => best = Some((idx, mv, score)),
+            }
+        }
+        best.map(|(_, mv, score)| (mv, score))
+    }
+}
+
+struct SearchCtx {
+    stop_at: Option<Instant>,
+    aborted: AtomicBool,
+    nodes: AtomicU64,
+}
+
+fn negamax(board: &Board, depth: u32, mut alpha: i32, beta: i32, ply: i32, ctx: &SearchCtx) -> i32 {
+    if ctx.aborted.load(Ordering::Relaxed) {
+        return 0;
+    }
+    if should_stop(ctx.stop_at) {
+        ctx.aborted.store(true, Ordering::Relaxed);
+        return 0;
+    }
+
+    ctx.nodes.fetch_add(1, Ordering::Relaxed);
+
+    // Leaf evaluation (no quiescence yet).
+    if depth == 0 {
+        return evaluate(board);
+    }
+
+    let mut moves = generate_legal_moves(board);
+    if moves.is_empty() {
+        // No legal moves means checkmate or stalemate.
+        if in_check(board, board.side_to_move) {
+            return -(CHECKMATE_SCORE - ply);
+        }
+        return 0;
+    }
+
+    order_moves(board, &mut moves);
+
+    let mut best = -INF;
+    for mv in moves {
+        let Some(next) = board.apply_move(mv) else {
+            continue;
+        };
+        let score = -negamax(&next, depth - 1, -beta, -alpha, ply + 1, ctx);
+        if ctx.aborted.load(Ordering::Relaxed) {
             return 0;
         }
-
-        self.nodes += 1;
-
-        if depth == 0 {
-            return evaluate(board);
+        if score > best {
+            best = score;
         }
-
-        let mut moves = generate_legal_moves(board);
-        if moves.is_empty() {
-            if in_check(board, board.side_to_move) {
-                return -(CHECKMATE_SCORE - ply);
-            }
-            return 0;
+        if score > alpha {
+            alpha = score;
         }
-
-        order_moves(board, &mut moves);
-
-        let mut best = -INF;
-        for mv in moves {
-            let Some(next) = board.apply_move(mv) else {
-                continue;
-            };
-            let score = -self.negamax(&next, depth - 1, -beta, -alpha, ply + 1);
-            if self.aborted {
-                return 0;
-            }
-            if score > best {
-                best = score;
-            }
-            if score > alpha {
-                alpha = score;
-            }
-            if alpha >= beta {
-                break;
-            }
+        // Alpha-beta cutoff: no need to search siblings that opponent avoids.
+        if alpha >= beta {
+            break;
         }
-        best
     }
+    best
+}
 
-    fn should_stop(&self) -> bool {
-        self.stop_at
-            .is_some_and(|deadline| Instant::now() >= deadline)
-    }
+fn should_stop(stop_at: Option<Instant>) -> bool {
+    stop_at.is_some_and(|deadline| Instant::now() >= deadline)
 }
 
 fn compute_stop_time(side_to_move: Color, limits: SearchLimits) -> Option<Duration> {
@@ -177,12 +229,14 @@ fn compute_stop_time(side_to_move: Color, limits: SearchLimits) -> Option<Durati
         Color::White => limits.winc_ms.unwrap_or(0),
         Color::Black => limits.binc_ms.unwrap_or(0),
     };
+    // Basic time policy: allocate roughly 1/N of remaining clock plus half increment.
     let moves_left = limits.movestogo.unwrap_or(30).max(1) as u64;
     let budget = (base_time / moves_left) + (inc / 2);
     Some(Duration::from_millis(budget.clamp(5, base_time.max(5))))
 }
 
 fn order_moves(board: &Board, moves: &mut [Move]) {
+    // Simple MVV-like ordering: prioritize captures and promotions.
     moves.sort_by_key(|mv| {
         let capture_value = board
             .piece_at(mv.to)
@@ -194,6 +248,7 @@ fn order_moves(board: &Board, moves: &mut [Move]) {
 }
 
 fn evaluate(board: &Board) -> i32 {
+    // Material-only eval from side-to-move perspective.
     let mut score = 0;
     for sq in 0_u8..64 {
         if let Some(piece) = board.piece_at(sq) {

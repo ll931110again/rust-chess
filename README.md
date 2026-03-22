@@ -17,6 +17,7 @@ This project currently focuses on core engine basics:
 - `src/movegen.rs` - pseudo-legal and legal move generation, check detection, perft.
 - `src/search.rs` - iterative deepening negamax alpha-beta search and evaluation.
 - `scripts/play_cli.py` - terminal helper to play White vs the engine (Black).
+- `scripts/benchmark.py` - benchmark helper for speed tests and cutechess matches.
 - `target/release/rustchess` - optimized engine binary (after release build).
 
 ## Build
@@ -127,3 +128,29 @@ You should see:
 - `readyok`
 - one or more `info depth ...` lines
 - `bestmove ...`
+
+## Benchmarking
+
+Build release first:
+
+```bash
+cargo build --release
+```
+
+Run local speed benchmark:
+
+```bash
+python3 scripts/benchmark.py speed --perft-depth 5 --search-depth 6 --repeats 3
+```
+
+Run match benchmark vs another UCI engine (Elo estimate from W/D/L):
+
+```bash
+python3 scripts/benchmark.py match --opponent stockfish --tc 10+0.1 --games 100
+```
+
+If `cutechess-cli` is unavailable, use the built-in lightweight fallback:
+
+```bash
+python3 scripts/benchmark.py mini-match --opponent stockfish --games 20 --movetime-ms 100
+```

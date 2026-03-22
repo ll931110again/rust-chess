@@ -10,6 +10,7 @@ pub fn run_uci() {
     let mut board = Board::default();
     let mut searcher = Searcher::new();
 
+    // Single-threaded UCI read-eval loop.
     for line in stdin.lock().lines() {
         let Ok(cmd_line) = line else {
             continue;
@@ -22,12 +23,21 @@ pub fn run_uci() {
         if cmd == "uci" {
             println!("id name rustchess-basic");
             println!("id author Cursor");
+            println!(
+                "option name Threads type spin default {} min 1 max 256",
+                searcher.threads()
+            );
             println!("uciok");
             continue;
         }
 
         if cmd == "isready" {
             println!("readyok");
+            continue;
+        }
+
+        if let Some(rest) = cmd.strip_prefix("setoption ") {
+            apply_setoption_command(&mut searcher, rest);
             continue;
         }
 
@@ -49,6 +59,7 @@ pub fn run_uci() {
 
         if let Some(rest) = cmd.strip_prefix("go ") {
             if let Some(depth_str) = rest.strip_prefix("perft ") {
+                // Non-standard helper for movegen validation from a GUI/CLI.
                 let depth = depth_str.parse::<u32>().unwrap_or(1);
                 let nodes = perft(&board, depth);
                 println!("info string perft depth {} nodes {}", depth, nodes);
@@ -115,6 +126,7 @@ fn apply_position_command(board: &mut Board, args: &str) -> Result<(), String> {
         return Err("position must start with startpos or fen".to_string());
     }
 
+    // Rebuild game state by replaying the provided UCI move list.
     if idx < tokens.len() && tokens[idx] == "moves" {
         idx += 1;
         while idx < tokens.len() {
@@ -171,6 +183,7 @@ fn parse_go_limits(args: &str) -> SearchLimits {
                 i += 2;
             }
             "infinite" => {
+                // Current engine has no async stop thread; use a practical fallback depth.
                 limits.depth = Some(10);
                 i += 1;
             }
@@ -180,4 +193,32 @@ fn parse_go_limits(args: &str) -> SearchLimits {
         }
     }
     limits
+}
+
+fn apply_setoption_command(searcher: &mut Searcher, args: &str) {
+    let tokens: Vec<&str> = args.split_whitespace().collect();
+    if tokens.is_empty() || tokens[0] != "name" {
+        return;
+    }
+
+    let value_idx = tokens.iter().position(|t| *t == "value");
+    let name_tokens = match value_idx {
+        Some(v) if v > 1 => &tokens[1..v],
+        Some(_) => &[][..],
+        None if tokens.len() > 1 => &tokens[1..],
+        None => &[][..],
+    };
+    let value_tokens = value_idx
+        .and_then(|v| tokens.get(v + 1..))
+        .unwrap_or(&[][..]);
+
+    let name = name_tokens.join(" ");
+    if name.eq_ignore_ascii_case("threads") {
+        if let Some(raw) = value_tokens.first() {
+            if let Ok(v) = raw.parse::<usize>() {
+                searcher.set_threads(v);
+                println!("info string threads set to {}", searcher.threads());
+            }
+        }
+    }
 }

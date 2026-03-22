@@ -74,6 +74,7 @@ impl fmt::Display for Move {
 
 #[derive(Clone, Debug)]
 pub struct Board {
+    // Flat 8x8 board: index = rank * 8 + file, with a1 = 0 and h8 = 63.
     pub squares: [Option<Piece>; 64],
     pub side_to_move: Color,
     pub castling: CastlingRights,
@@ -101,6 +102,7 @@ impl Board {
             return Err("FEN board must have 8 ranks".to_string());
         }
 
+        // FEN ranks are listed from rank 8 to rank 1; map them to our a1-based indexing.
         for (fen_rank, rank_str) in ranks.iter().enumerate() {
             let board_rank = 7_u8.saturating_sub(fen_rank as u8);
             let mut file = 0_u8;
@@ -187,6 +189,7 @@ impl Board {
         let mut captured_piece = next.piece_at(mv.to);
         next.squares[mv.from as usize] = None;
 
+        // En-passant captures a pawn on the adjacent file, not on the destination square.
         if mv.is_en_passant {
             let capture_sq = if moving_piece.color == Color::White {
                 mv.to.checked_sub(8)?
@@ -207,6 +210,7 @@ impl Board {
         };
         next.squares[mv.to as usize] = Some(placed_piece);
 
+        // Castling is encoded as king move; this block repositions the rook.
         if mv.is_castling && moving_piece.kind == PieceKind::King {
             match (moving_piece.color, mv.to) {
                 (Color::White, 6) => {
@@ -241,6 +245,7 @@ impl Board {
             }
         }
 
+        // Moving king/rook (or capturing rook) can permanently remove castling rights.
         match moving_piece.kind {
             PieceKind::King => match moving_piece.color {
                 Color::White => {
@@ -278,6 +283,7 @@ impl Board {
         if moving_piece.kind == PieceKind::Pawn {
             let delta = mv.to.abs_diff(mv.from);
             if delta == 16 {
+                // Store the square "passed over" so opponent can capture en-passant next ply.
                 next.en_passant = Some(if moving_piece.color == Color::White {
                     mv.from + 8
                 } else {
