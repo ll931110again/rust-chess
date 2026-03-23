@@ -47,3 +47,4 @@ game 35/100: our_color=W result=1-0 plies=93 W-L-D=22-5-8 elapsed=8206.7s avg=23
 game 36/100: our_color=B result=1-0 plies=37 W-L-D=22-6-8 elapsed=8337.5s avg=231.6s/game eta=14822.2s
 game 37/100: our_color=W result=1/2-1/2 plies=139 W-L-D=22-6-9 elapsed=8584.3s avg=232.0s/game eta=14616.5s
 game 38/100: our_color=B result=0-1 plies=60 W-L-D=23-6-9 elapsed=8677.5s avg=228.4s/game eta=14158.1s
+game 39/100: our_color=W result=1-0 plies=75 W-L-D=24-6-9 elapsed=8996.4s avg=230.7s/game eta=14071.3s

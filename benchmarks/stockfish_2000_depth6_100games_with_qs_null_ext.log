@@ -41,3 +41,4 @@ game 30/100: our_color=B result=0-1 plies=62 W-L-D=19-2-9 elapsed=7161.8s avg=23
 sample game 30: plies=62 moves=d2d4 d7d5 c2c4 d5c4 e2e3 c8e6 g1f3 b8c6 b1d2 b7b5 a2a4 a7a6 a4b5 a6b5 d4d5 a8a1 d5c6 e6d5 b2b3 c4b3 f3e5 b3b2 c1b2 a1d1 e1d1 f7f6 e3e4 d5e4 f2f3 e4d5 d1e1 f6e5 b2e5 d5c6 d2e4 g8f6 e4g5 d8d7 f1e2 d7f5 ...
 game 31/100: our_color=W result=1-0 plies=81 W-L-D=20-2-9 elapsed=7457.0s avg=240.5s/game eta=16597.8s
 game 32/100: our_color=B result=1/2-1/2 plies=226 W-L-D=20-2-10 elapsed=7873.5s avg=246.0s/game eta=16731.2s
+game 33/100: our_color=W result=1-0 plies=59 W-L-D=21-2-10 elapsed=8073.4s avg=244.6s/game eta=16391.4s

@@ -1,3 +1,26 @@
+//! Search subsystem overview.
+//!
+//! This module currently implements:
+//! - Iterative deepening over fixed depth / time-based limits.
+//! - Root-level parallel search (work-shared across legal root moves).
+//! - Negamax with alpha-beta pruning.
+//! - Quiescence search (captures/promotions/en-passant only).
+//! - Null-move pruning (with simple safeguards).
+//! - Tactical move ordering (capture/promotion priority).
+//! - Search extensions:
+//!   - check extension
+//!   - singular extension (lightweight probe)
+//!   - passed-pawn push-to-7th extension
+//! - Basic time management from UCI time controls.
+//!
+//! Known limitations / not implemented yet:
+//! - No transposition table (TT) or hash move ordering.
+//! - No repetition/50-move adjudication inside search (handled externally by game flow).
+//! - No aspiration windows / principal-variation table.
+//! - No killer/history/countermove heuristics.
+//! - No late-move reductions (LMR) or futility pruning.
+//! - Quiescence does not include check evasions as a separate extension policy.
+
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, AtomicU64, AtomicUsize, Ordering};
 use std::sync::mpsc;
@@ -70,6 +93,7 @@ impl Searcher {
         let mut last_completed_depth = 0;
 
         // Iterative deepening: progressively search deeper and keep last complete result.
+        // If time expires mid-iteration, we retain the previous fully completed depth.
         for depth in 1..=max_depth {
             let mut root_moves = generate_legal_moves(board);
             order_moves(board, &mut root_moves);
@@ -116,6 +140,8 @@ impl Searcher {
         depth: u32,
         ctx: &SearchCtx,
     ) -> Option<(Move, i32)> {
+        // Root parallelization model:
+        // each worker pulls the next unsearched root move index atomically.
         let workers = self.threads.min(root_moves.len()).max(1);
         let next_index = Arc::new(AtomicUsize::new(0));
         let (tx, rx) = mpsc::channel::<(usize, Move, i32)>();
@@ -176,6 +202,11 @@ fn negamax(
     ctx: &SearchCtx,
     extensions_used: u8,
 ) -> i32 {
+    // Main full-width search with alpha-beta pruning.
+    // This function owns:
+    // - null-move pruning
+    // - extension logic
+    // - fallback to quiescence at depth 0
     if ctx.aborted.load(Ordering::Relaxed) {
         return 0;
     }
@@ -193,7 +224,8 @@ fn negamax(
 
     let side_in_check = in_check(board, board.side_to_move);
 
-    // Null-move pruning: if passing still stays above beta, likely a cutoff.
+    // Null-move pruning: if "doing nothing" still fails high, prune this node.
+    // Safeguards: disabled in check and in low-material pawn endgames.
     if depth > NULL_MOVE_REDUCTION + 1 && !side_in_check && has_non_pawn_material(board, board.side_to_move) {
         let mut null_board = board.clone();
         null_board.en_passant = None;
@@ -230,6 +262,7 @@ fn negamax(
     }
 
     order_moves(board, &mut moves);
+    // Probe for a potentially singular best move.
     let singular_move = detect_singular_move(
         board,
         &moves,
@@ -246,6 +279,7 @@ fn negamax(
         let Some(next) = board.apply_move(mv) else {
             continue;
         };
+        // Extension policy (at most +1 ply per child node in this implementation).
         let mut extension = 0_u32;
         if extensions_used < MAX_EXTENSIONS_PER_LINE {
             if side_in_check {
@@ -279,6 +313,8 @@ fn negamax(
 }
 
 fn quiescence(board: &Board, mut alpha: i32, beta: i32, ply: i32, ctx: &SearchCtx) -> i32 {
+    // Tactical tail search:
+    // avoid evaluating noisy leaves by searching only tactical continuations.
     if ctx.aborted.load(Ordering::Relaxed) {
         return 0;
     }
@@ -359,7 +395,9 @@ fn detect_singular_move(
     ctx: &SearchCtx,
     extensions_used: u8,
 ) -> Option<Move> {
-    // Lightweight singular extension probe: if the top-ordered move clearly dominates.
+    // Lightweight singular extension probe:
+    // shallowly test top candidates and extend only when the best move
+    // is clearly ahead by SINGULAR_MARGIN_CP.
     if depth < 4 || moves.len() < 2 {
         return None;
     }
