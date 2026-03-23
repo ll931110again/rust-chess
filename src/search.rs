@@ -4,7 +4,8 @@ use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
 
-use crate::board::{Board, Color, Move, PieceKind};
+use crate::board::{Board, Color, Move};
+use crate::eval::{evaluate, piece_value};
 use crate::movegen::{generate_legal_moves, in_check};
 
 const CHECKMATE_SCORE: i32 = 30_000;
@@ -245,35 +246,4 @@ fn order_moves(board: &Board, moves: &mut [Move]) {
         let promo_bonus = mv.promotion.map(piece_value).unwrap_or(0);
         -(capture_value + promo_bonus)
     });
-}
-
-fn evaluate(board: &Board) -> i32 {
-    // Material-only eval from side-to-move perspective.
-    let mut score = 0;
-    for sq in 0_u8..64 {
-        if let Some(piece) = board.piece_at(sq) {
-            let val = piece_value(piece.kind);
-            if piece.color == Color::White {
-                score += val;
-            } else {
-                score -= val;
-            }
-        }
-    }
-    if board.side_to_move == Color::White {
-        score
-    } else {
-        -score
-    }
-}
-
-fn piece_value(kind: PieceKind) -> i32 {
-    match kind {
-        PieceKind::Pawn => 100,
-        PieceKind::Knight => 320,
-        PieceKind::Bishop => 330,
-        PieceKind::Rook => 500,
-        PieceKind::Queen => 900,
-        PieceKind::King => 0,
-    }
 }

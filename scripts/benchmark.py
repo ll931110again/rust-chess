@@ -130,7 +130,14 @@ def parse_args() -> argparse.Namespace:
     mini.add_argument(
         "--full-game-log",
         action="store_true",
-        help="Print full move list for every game.",
+        default=True,
+        help="Print full move list for every game (default: enabled).",
+    )
+    mini.add_argument(
+        "--no-full-game-log",
+        action="store_false",
+        dest="full_game_log",
+        help="Disable full move list printing for each game.",
     )
 
     return parser.parse_args()
@@ -417,6 +424,7 @@ def run_mini_match(
                 limit = chess.engine.Limit(depth=max(1, depth))
             else:
                 limit = chess.engine.Limit(time=max(0.001, movetime_ms / 1000.0))
+            match_start = time.perf_counter()
             for game_idx in range(games):
                 board = chess.Board()
                 our_is_white = (game_idx % 2 == 0)
@@ -451,9 +459,14 @@ def run_mini_match(
                             losses += 1
                     game_result = outcome.result()
 
+                elapsed_s = max(0.001, time.perf_counter() - match_start)
+                done = game_idx + 1
+                avg_s_per_game = elapsed_s / done
+                eta_s = avg_s_per_game * (games - done)
                 print(
-                    f"game {game_idx + 1}/{games}: our_color={'W' if our_is_white else 'B'} "
-                    f"result={game_result} W-L-D={wins}-{losses}-{draws}"
+                    f"game {done}/{games}: our_color={'W' if our_is_white else 'B'} "
+                    f"result={game_result} plies={len(game_moves)} W-L-D={wins}-{losses}-{draws} "
+                    f"elapsed={elapsed_s:.1f}s avg={avg_s_per_game:.1f}s/game eta={eta_s:.1f}s"
                 )
                 if full_game_log:
                     move_chunks = []
@@ -464,8 +477,8 @@ def run_mini_match(
                         move_chunks.append(f"{move_no}. {white} {black}".rstrip())
                     print(f"full game {game_idx + 1}: {' '.join(move_chunks)}")
                 if (game_idx + 1) % 10 == 0:
-                    preview = " ".join(game_moves[:40])
-                    if len(game_moves) > 40:
+                    preview = " ".join(game_moves if full_game_log else game_moves[:40])
+                    if not full_game_log and len(game_moves) > 40:
                         preview += " ..."
                     print(
                         f"sample game {game_idx + 1}: plies={len(game_moves)} "
