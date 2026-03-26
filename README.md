@@ -15,6 +15,7 @@ This project currently focuses on core engine basics:
 - `src/uci.rs` - UCI command handling (`uci`, `isready`, `position`, `go`, `quit`).
 - `src/board.rs` - board state model, FEN parsing, move application.
 - `src/movegen.rs` - pseudo-legal and legal move generation, check detection, perft.
+- `src/opening_book.rs` - local opening-book client (`/move?fen=...`) with safe fallback to search.
 - `src/search.rs` - iterative deepening negamax search, alpha-beta pruning, quiescence, null-move pruning, and extensions.
 - `scripts/play_cli.py` - terminal helper to play White vs the engine (Black).
 - `scripts/benchmark.py` - benchmark helper for speed tests and cutechess matches.
@@ -36,7 +37,8 @@ Current search status (see `src/search.rs` for implementation details):
 | Singular extension | Implemented (lightweight) | Shallow probe; extends move if clearly best |
 | Passed pawn extension | Implemented | Extends pawn pushes reaching 7th rank (or 2nd for Black) |
 | Time management | Implemented (basic) | Uses movetime or simple budget from remaining clock/increment |
-| Transposition table (TT) | Not implemented | No hash table, no TT cutoffs, no hash move |
+| Opening book | Implemented | Local opening-book service lookup, toggle via `OwnBook` UCI option |
+| Transposition table (TT) | Not implemented | No hash table, no TT cutoffs, no hash move ordering |
 | Repetition / 50-move draw in search | Not implemented | Draw resolution mostly handled by outer game flow/driver |
 | Aspiration windows | Not implemented | Uses full-window root iterations |
 | Killer/history heuristics | Not implemented | No quiet-move history/killer ordering |
@@ -187,6 +189,31 @@ Note: UCI moves are not SAN/PGN notation.
 - `go movetime <ms>`
 - `go wtime <ms> btime <ms> [winc <ms>] [binc <ms>] [movestogo <n>]`
 - `go perft <depth>`
+- `setoption name OwnBook value true|false`
+
+Note: `OwnBook` queries a local service by default (`http://127.0.0.1:8765/move`).
+If the service is unavailable or returns no move, the engine automatically falls back to normal search.
+
+### Local Opening Book Setup
+
+Download a strong Polyglot book:
+
+```bash
+bash scripts/download_opening_book.sh
+```
+
+Start local book service (requires `python-chess`):
+
+```bash
+python3 -m pip install chess
+python3 scripts/opening_book_server.py --book books/komodo.bin --host 127.0.0.1 --port 8765
+```
+
+Optional override endpoint:
+
+```bash
+RUSTCHESS_BOOK_URL="http://127.0.0.1:8765/move" ./target/release/rustchess
+```
 - `stop`
 - `quit`
 
@@ -227,3 +254,7 @@ If `cutechess-cli` is unavailable, use the built-in lightweight fallback:
 ```bash
 python3 scripts/benchmark.py mini-match --opponent stockfish --games 20 --movetime-ms 100
 ```
+
+For ongoing engine tuning, keep benchmark snapshots in:
+
+- `benchmarks/BASELINES.md` - recorded speed/Elo baselines and commands used.

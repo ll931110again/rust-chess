@@ -6,7 +6,7 @@
 //! - Negamax with alpha-beta pruning.
 //! - Quiescence search (captures/promotions/en-passant only).
 //! - Null-move pruning (with simple safeguards).
-//! - Tactical move ordering (capture/promotion priority).
+//! - Tactical/forcing move ordering (checks, captures, promotions).
 //! - Search extensions:
 //!   - check extension
 //!   - singular extension (lightweight probe)
@@ -464,13 +464,49 @@ fn compute_stop_time(side_to_move: Color, limits: SearchLimits) -> Option<Durati
 }
 
 fn order_moves(board: &Board, moves: &mut [Move]) {
-    // Simple MVV-like ordering: prioritize captures and promotions.
-    moves.sort_by_key(|mv| {
-        let capture_value = board
-            .piece_at(mv.to)
-            .map(|piece| piece_value(piece.kind))
-            .unwrap_or(0);
-        let promo_bonus = mv.promotion.map(piece_value).unwrap_or(0);
-        -(capture_value + promo_bonus)
-    });
+    let side_in_check = in_check(board, board.side_to_move);
+    moves.sort_by_key(|mv| -move_order_score(board, *mv, side_in_check));
+}
+
+fn move_order_score(board: &Board, mv: Move, side_in_check: bool) -> i32 {
+    let mut score = 0_i32;
+
+    // Evasion nodes are forced by definition; keep them above quiet alternatives.
+    if side_in_check {
+        score += 40_000;
+    }
+
+    let attacker_value = board
+        .piece_at(mv.from)
+        .map(|piece| piece_value(piece.kind))
+        .unwrap_or(0);
+    let capture_value = if mv.is_en_passant {
+        piece_value(PieceKind::Pawn)
+    } else {
+        board.piece_at(mv.to).map(|piece| piece_value(piece.kind)).unwrap_or(0)
+    };
+    if capture_value > 0 {
+        // MVV/LVA-style: prefer winning captures and tactical trades first.
+        score += 15_000 + (capture_value * 32) - attacker_value;
+    }
+    if mv.is_en_passant {
+        score += 500;
+    }
+    if let Some(promo) = mv.promotion {
+        score += 20_000 + piece_value(promo) * 32;
+    }
+
+    // Checking moves are forcing: opponent must respond immediately.
+    if board
+        .apply_move(mv)
+        .is_some_and(|next| in_check(&next, next.side_to_move))
+    {
+        score += 30_000;
+    }
+
+    if is_passed_pawn_push_to_7th(board, mv) {
+        score += 2_000;
+    }
+
+    score
 }

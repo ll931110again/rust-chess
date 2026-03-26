@@ -42,3 +42,27 @@ sample game 30: plies=62 moves=d2d4 d7d5 c2c4 d5c4 e2e3 c8e6 g1f3 b8c6 b1d2 b7b5
 game 31/100: our_color=W result=1-0 plies=81 W-L-D=20-2-9 elapsed=7457.0s avg=240.5s/game eta=16597.8s
 game 32/100: our_color=B result=1/2-1/2 plies=226 W-L-D=20-2-10 elapsed=7873.5s avg=246.0s/game eta=16731.2s
 game 33/100: our_color=W result=1-0 plies=59 W-L-D=21-2-10 elapsed=8073.4s avg=244.6s/game eta=16391.4s
+game 34/100: our_color=B result=0-1 plies=84 W-L-D=22-2-10 elapsed=8399.1s avg=247.0s/game eta=16304.2s
+game 35/100: our_color=W result=1-0 plies=65 W-L-D=23-2-10 elapsed=8616.7s avg=246.2s/game eta=16002.5s
+game 36/100: our_color=B result=1/2-1/2 plies=172 W-L-D=23-2-11 elapsed=8940.1s avg=248.3s/game eta=15893.4s
+game 37/100: our_color=W result=1-0 plies=99 W-L-D=24-2-11 elapsed=9387.8s avg=253.7s/game eta=15984.6s
+game 38/100: our_color=B result=1/2-1/2 plies=110 W-L-D=24-2-12 elapsed=9904.3s avg=260.6s/game eta=16159.6s
+game 39/100: our_color=W result=1/2-1/2 plies=97 W-L-D=24-2-13 elapsed=10382.6s avg=266.2s/game eta=16239.4s
+game 40/100: our_color=B result=1-0 plies=53 W-L-D=24-3-13 elapsed=10631.1s avg=265.8s/game eta=15946.6s
+sample game 40: plies=53 moves=d2d4 d7d5 c2c4 d5c4 e2e3 c8e6 b1c3 g8f6 h2h3 b8c6 g1e2 e6d7 e2g3 d7e6 f1e2 d8d7 c3a4 b7b6 b2b3 c4b3 a2b3 e6d5 a4c3 d5g2 h1h2 g2h3 h2h3 d7h3 e2b5 h3e6 d4d5 f6d5 d1d5 e6d5 c3d5 e8c8 b5c6 d8d6 d5b4 a7a5 ...
+game 41/100: our_color=W result=1/2-1/2 plies=63 W-L-D=24-3-14 elapsed=11120.8s avg=271.2s/game eta=16003.1s
+game 42/100: our_color=B result=1/2-1/2 plies=85 W-L-D=24-3-15 elapsed=12230.2s avg=291.2s/game eta=16889.3s
+game 43/100: our_color=W result=1-0 plies=75 W-L-D=25-3-15 elapsed=12507.2s avg=290.9s/game eta=16579.3s
+game 44/100: our_color=B result=0-1 plies=88 W-L-D=26-3-15 elapsed=12635.0s avg=287.2s/game eta=16081.0s
+game 45/100: our_color=W result=1/2-1/2 plies=66 W-L-D=26-3-16 elapsed=12842.2s avg=285.4s/game eta=15696.1s
+game 46/100: our_color=B result=0-1 plies=122 W-L-D=27-3-16 elapsed=13172.4s avg=286.4s/game eta=15463.3s
+game 47/100: our_color=W result=1-0 plies=61 W-L-D=28-3-16 elapsed=13316.0s avg=283.3s/game eta=15015.9s
+game 48/100: our_color=B result=1-0 plies=79 W-L-D=28-4-16 elapsed=13888.1s avg=289.3s/game eta=15045.4s
+game 49/100: our_color=W result=1-0 plies=85 W-L-D=29-4-16 elapsed=14087.3s avg=287.5s/game eta=14662.2s
+game 50/100: our_color=B result=1-0 plies=89 W-L-D=29-5-16 elapsed=14294.6s avg=285.9s/game eta=14294.6s
+sample game 50: plies=89 moves=e2e4 b8c6 d2d4 d7d5 b1c3 e7e6 g1f3 f8b4 c1g5 b4c3 b2c3 g8e7 e4d5 e6d5 f1d3 h7h6 g5h4 g7g5 h4g3 c8f5 a1b1 f5d3 c2d3 a8b8 f3e5 e8g8 f2f4 f7f6 e5g4 e7f5 e1g1 g8h8 d1f3 h6h5 f4g5 f5g3 f3g3 h5g4 g3h4 h8g7 ...
+game 51/100: our_color=W result=1-0 plies=151 W-L-D=30-5-16 elapsed=14727.8s avg=288.8s/game eta=14150.2s
+game 52/100: our_color=B result=1/2-1/2 plies=131 W-L-D=30-5-17 elapsed=15312.6s avg=294.5s/game eta=14134.7s
+game 53/100: our_color=W result=1-0 plies=85 W-L-D=31-5-17 elapsed=16811.2s avg=317.2s/game eta=14908.1s
+game 54/100: our_color=B result=1-0 plies=125 W-L-D=31-6-17 elapsed=17914.9s avg=331.8s/game eta=15260.8s
+game 55/100: our_color=W result=1-0 plies=63 W-L-D=32-6-17 elapsed=18376.6s avg=334.1s/game eta=15035.4s

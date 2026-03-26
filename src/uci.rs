@@ -2,6 +2,7 @@ use std::io::{self, BufRead, Write};
 
 use crate::board::{Board, CLASSIC_STARTPOS_FEN};
 use crate::movegen::{generate_legal_moves, perft};
+use crate::opening_book::pick_book_move;
 use crate::search::{SearchLimits, Searcher};
 
 pub fn run_uci() {
@@ -9,6 +10,7 @@ pub fn run_uci() {
     let mut stdout = io::stdout();
     let mut board = Board::default();
     let mut searcher = Searcher::new();
+    let mut own_book_enabled = true;
 
     // Single-threaded UCI read-eval loop.
     for line in stdin.lock().lines() {
@@ -27,6 +29,7 @@ pub fn run_uci() {
                 "option name Threads type spin default {} min 1 max 256",
                 searcher.threads()
             );
+            println!("option name OwnBook type check default true");
             println!("uciok");
             continue;
         }
@@ -37,7 +40,7 @@ pub fn run_uci() {
         }
 
         if let Some(rest) = cmd.strip_prefix("setoption ") {
-            apply_setoption_command(&mut searcher, rest);
+            apply_setoption_command(&mut searcher, &mut own_book_enabled, rest);
             continue;
         }
 
@@ -68,6 +71,13 @@ pub fn run_uci() {
             }
 
             let limits = parse_go_limits(rest);
+            if own_book_enabled {
+                if let Some(book_move) = pick_book_move(&board) {
+                    println!("info string book move {}", book_move.to_uci());
+                    println!("bestmove {}", book_move.to_uci());
+                    continue;
+                }
+            }
             let result = searcher.iterative_deepening(&board, limits);
             println!(
                 "info string search done depth {} score_cp {} nodes {} time {}",
@@ -195,7 +205,7 @@ fn parse_go_limits(args: &str) -> SearchLimits {
     limits
 }
 
-fn apply_setoption_command(searcher: &mut Searcher, args: &str) {
+fn apply_setoption_command(searcher: &mut Searcher, own_book_enabled: &mut bool, args: &str) {
     let tokens: Vec<&str> = args.split_whitespace().collect();
     if tokens.is_empty() || tokens[0] != "name" {
         return;
@@ -218,6 +228,16 @@ fn apply_setoption_command(searcher: &mut Searcher, args: &str) {
             if let Ok(v) = raw.parse::<usize>() {
                 searcher.set_threads(v);
                 println!("info string threads set to {}", searcher.threads());
+            }
+        }
+    } else if name.eq_ignore_ascii_case("ownbook") {
+        if let Some(raw) = value_tokens.first() {
+            if raw.eq_ignore_ascii_case("true") {
+                *own_book_enabled = true;
+                println!("info string ownbook enabled");
+            } else if raw.eq_ignore_ascii_case("false") {
+                *own_book_enabled = false;
+                println!("info string ownbook disabled");
             }
         }
     }
