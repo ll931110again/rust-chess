@@ -1,0 +1,121 @@
+== Mini match (direct UCI) ==
+our engine: /Users/linh/code/rustchess/target/release/rustchess
+opponent: stockfish
+games: 100, depth: 6, max_plies: 300
+requested all CPU cores: 10
+our engine configured: Threads=10
+opponent configured: Threads=10
+opponent limited to UCI_Elo=1800
+game 1/100: our_color=W result=0-1 plies=58 W-L-D=0-1-0 elapsed=2.1s avg=2.1s/game eta=206.7s
+game 2/100: our_color=B result=1-0 plies=77 W-L-D=0-2-0 elapsed=4.7s avg=2.4s/game eta=231.9s
+game 3/100: our_color=W result=0-1 plies=104 W-L-D=0-3-0 elapsed=7.5s avg=2.5s/game eta=242.9s
+game 4/100: our_color=B result=1-0 plies=87 W-L-D=0-4-0 elapsed=11.5s avg=2.9s/game eta=275.9s
+game 5/100: our_color=W result=0-1 plies=102 W-L-D=0-5-0 elapsed=13.6s avg=2.7s/game eta=258.5s
+game 6/100: our_color=B result=1-0 plies=89 W-L-D=0-6-0 elapsed=16.9s avg=2.8s/game eta=265.2s
+game 7/100: our_color=W result=0-1 plies=56 W-L-D=0-7-0 elapsed=18.5s avg=2.6s/game eta=245.9s
+game 8/100: our_color=B result=1-0 plies=59 W-L-D=0-8-0 elapsed=20.6s avg=2.6s/game eta=236.6s
+game 9/100: our_color=W result=0-1 plies=82 W-L-D=0-9-0 elapsed=23.1s avg=2.6s/game eta=233.7s
+game 10/100: our_color=B result=1-0 plies=131 W-L-D=0-10-0 elapsed=27.9s avg=2.8s/game eta=250.9s
+sample game 10: plies=131 moves=d2d4 d7d5 g1f3 e7e6 c2c4 d5c4 d1a4 d8d7 a4c4 b8c6 a2a3 f8d6 e2e4 g8f6 e4e5 b7b5 c4b5 c6d4 f3d4 c7c6 b5e2 d6e7 e5f6 g7f6 c1e3 c6c5 d4c2 a8b8 b1c3 e6e5 a1b1 b8b6 h2h4 c8b7 f2f3 h7h6 e2d1 d7f5 b2b4 b6d6 ...
+game 11/100: our_color=W result=0-1 plies=48 W-L-D=0-11-0 elapsed=29.4s avg=2.7s/game eta=237.6s
+game 12/100: our_color=B result=1-0 plies=167 W-L-D=0-12-0 elapsed=33.5s avg=2.8s/game eta=245.9s
+game 13/100: our_color=W result=0-1 plies=52 W-L-D=0-13-0 elapsed=34.7s avg=2.7s/game eta=232.2s
+game 14/100: our_color=B result=1-0 plies=65 W-L-D=0-14-0 elapsed=36.9s avg=2.6s/game eta=226.5s
+game 15/100: our_color=W result=1/2-1/2 plies=297 W-L-D=0-14-1 elapsed=39.8s avg=2.7s/game eta=225.8s
+game 16/100: our_color=B result=1-0 plies=177 W-L-D=0-15-1 elapsed=45.0s avg=2.8s/game eta=236.1s
+game 17/100: our_color=W result=0-1 plies=230 W-L-D=0-16-1 elapsed=48.1s avg=2.8s/game eta=234.9s
+game 18/100: our_color=B result=0-1 plies=88 W-L-D=1-16-1 elapsed=51.3s avg=2.9s/game eta=233.8s
+game 19/100: our_color=W result=0-1 plies=52 W-L-D=1-17-1 elapsed=52.3s avg=2.8s/game eta=223.1s
+game 20/100: our_color=B result=1-0 plies=123 W-L-D=1-18-1 elapsed=56.7s avg=2.8s/game eta=227.0s
+sample game 20: plies=123 moves=g1f3 d7d5 c2c3 g8f6 d2d4 b8c6 c1f4 c8f5 d1b3 a8b8 e2e3 a7a6 f3h4 f5d7 h4f3 a6a5 f4g3 e7e6 f1d3 a5a4 b3a4 b8a8 a4b3 d8c8 b1d2 h7h6 b3c2 f6h5 e1g1 f8e7 a2a4 a8b8 g3h4 g7g5 h4g3 e8g8 b2b4 g8h8 c2d1 g5g4 ...
+game 21/100: our_color=W result=0-1 plies=80 W-L-D=1-19-1 elapsed=59.6s avg=2.8s/game eta=224.3s
+game 22/100: our_color=B result=1-0 plies=111 W-L-D=1-20-1 elapsed=63.1s avg=2.9s/game eta=223.9s
+game 23/100: our_color=W result=0-1 plies=254 W-L-D=1-21-1 elapsed=67.1s avg=2.9s/game eta=224.5s
+game 24/100: our_color=B result=1-0 plies=49 W-L-D=1-22-1 elapsed=69.9s avg=2.9s/game eta=221.2s
+game 25/100: our_color=W result=0-1 plies=56 W-L-D=1-23-1 elapsed=72.4s avg=2.9s/game eta=217.3s
+game 26/100: our_color=B result=1/2-1/2 plies=68 W-L-D=1-23-2 elapsed=74.9s avg=2.9s/game eta=213.3s
+game 27/100: our_color=W result=0-1 plies=48 W-L-D=1-24-2 elapsed=76.3s avg=2.8s/game eta=206.3s
+game 28/100: our_color=B result=1-0 plies=223 W-L-D=1-25-2 elapsed=84.2s avg=3.0s/game eta=216.6s
+game 29/100: our_color=W result=0-1 plies=146 W-L-D=1-26-2 elapsed=89.2s avg=3.1s/game eta=218.5s
+game 30/100: our_color=B result=1-0 plies=199 W-L-D=1-27-2 elapsed=92.3s avg=3.1s/game eta=215.5s
+sample game 30: plies=199 moves=e2e3 e7e6 d2d4 b8c6 e3e4 g8f6 b1c3 f8b4 a2a3 b4c3 b2c3 f6e4 d1g4 d7d5 f2f3 e4c3 c1d2 c3e4 f3e4 d5e4 g4e4 d8d4 e4d4 c6d4 e1c1 c8d7 g1f3 d4f3 g2f3 d7c6 f1e2 a7a5 d1g1 g7g6 g1g5 f7f5 g5g3 e6e5 d2c3 e8c8 ...
+game 31/100: our_color=W result=0-1 plies=104 W-L-D=1-28-2 elapsed=94.4s avg=3.0s/game eta=210.0s
+game 32/100: our_color=B result=1-0 plies=87 W-L-D=1-29-2 elapsed=98.4s avg=3.1s/game eta=209.2s
+game 33/100: our_color=W result=0-1 plies=172 W-L-D=1-30-2 elapsed=104.7s avg=3.2s/game eta=212.6s
+game 34/100: our_color=B result=1/2-1/2 plies=194 W-L-D=1-30-3 elapsed=109.1s avg=3.2s/game eta=211.8s
+game 35/100: our_color=W result=0-1 plies=104 W-L-D=1-31-3 elapsed=112.6s avg=3.2s/game eta=209.2s
+game 36/100: our_color=B result=1/2-1/2 plies=178 W-L-D=1-31-4 elapsed=116.4s avg=3.2s/game eta=207.0s
+game 37/100: our_color=W result=0-1 plies=68 W-L-D=1-32-4 elapsed=118.3s avg=3.2s/game eta=201.4s
+game 38/100: our_color=B result=1-0 plies=43 W-L-D=1-33-4 elapsed=119.7s avg=3.2s/game eta=195.3s
+game 39/100: our_color=W result=1/2-1/2 plies=251 W-L-D=1-33-5 elapsed=126.3s avg=3.2s/game eta=197.5s
+game 40/100: our_color=B result=1-0 plies=157 W-L-D=1-34-5 elapsed=129.9s avg=3.2s/game eta=194.8s
+sample game 40: plies=157 moves=c2c3 d7d5 d2d4 e7e6 g2g3 b8c6 a2a4 g8f6 g1f3 d8d7 f1g2 f8d6 e1g1 e8f8 f1e1 h7h5 b1d2 a7a6 a4a5 c6e7 e2e4 d7e8 e4e5 d6e5 d4e5 f6d7 b2b3 d7c5 e1e2 c5d3 c3c4 e8c6 f3e1 d3c5 c1a3 c8d7 h2h3 a8d8 a1c1 h5h4 ...
+game 41/100: our_color=W result=0-1 plies=60 W-L-D=1-35-5 elapsed=131.8s avg=3.2s/game eta=189.6s
+game 42/100: our_color=B result=1-0 plies=111 W-L-D=1-36-5 elapsed=135.8s avg=3.2s/game eta=187.5s
+game 43/100: our_color=W result=0-1 plies=164 W-L-D=1-37-5 elapsed=139.8s avg=3.3s/game eta=185.3s
+game 44/100: our_color=B result=1/2-1/2 plies=69 W-L-D=1-37-6 elapsed=142.5s avg=3.2s/game eta=181.3s
+game 45/100: our_color=W result=1/2-1/2 plies=70 W-L-D=1-37-7 elapsed=144.8s avg=3.2s/game eta=177.0s
+game 46/100: our_color=B result=1/2-1/2 plies=120 W-L-D=1-37-8 elapsed=148.8s avg=3.2s/game eta=174.7s
+game 47/100: our_color=W result=0-1 plies=86 W-L-D=1-38-8 elapsed=151.8s avg=3.2s/game eta=171.2s
+game 48/100: our_color=B result=1-0 plies=63 W-L-D=1-39-8 elapsed=154.8s avg=3.2s/game eta=167.7s
+game 49/100: our_color=W result=0-1 plies=92 W-L-D=1-40-8 elapsed=157.6s avg=3.2s/game eta=164.0s
+game 50/100: our_color=B result=1-0 plies=45 W-L-D=1-41-8 elapsed=158.5s avg=3.2s/game eta=158.5s
+sample game 50: plies=45 moves=e2e4 a7a6 g1f3 g8f6 e4e5 f6d5 c2c4 d5b4 d2d4 d7d6 d1a4 b4c6 c1e3 c8g4 d4d5 g4f3 g2f3 d6e5 h2h4 d8d6 b1c3 e7e6 c4c5 d6e7 d5c6 b8c6 f1b5 e7d7 e1g1 e8c8 f1d1 d7e7 b5c6 d8d1 a1d1 h7h6 c6b7 c8b7 c5c6 b7a8 ...
+game 51/100: our_color=W result=0-1 plies=124 W-L-D=1-42-8 elapsed=163.1s avg=3.2s/game eta=156.7s
+game 52/100: our_color=B result=1/2-1/2 plies=162 W-L-D=1-42-9 elapsed=167.4s avg=3.2s/game eta=154.5s
+game 53/100: our_color=W result=0-1 plies=120 W-L-D=1-43-9 elapsed=171.5s avg=3.2s/game eta=152.1s
+game 54/100: our_color=B result=0-1 plies=82 W-L-D=2-43-9 elapsed=173.9s avg=3.2s/game eta=148.1s
+game 55/100: our_color=W result=0-1 plies=110 W-L-D=2-44-9 elapsed=177.6s avg=3.2s/game eta=145.3s
+game 56/100: our_color=B result=1-0 plies=67 W-L-D=2-45-9 elapsed=179.4s avg=3.2s/game eta=141.0s
+game 57/100: our_color=W result=0-1 plies=70 W-L-D=2-46-9 elapsed=182.2s avg=3.2s/game eta=137.5s
+game 58/100: our_color=B result=1-0 plies=51 W-L-D=2-47-9 elapsed=183.9s avg=3.2s/game eta=133.1s
+game 59/100: our_color=W result=0-1 plies=52 W-L-D=2-48-9 elapsed=185.2s avg=3.1s/game eta=128.7s
+game 60/100: our_color=B result=1/2-1/2 plies=218 W-L-D=2-48-10 elapsed=193.5s avg=3.2s/game eta=129.0s
+sample game 60: plies=218 moves=c2c3 d7d5 d2d4 e7e6 c1f4 b8d7 b1d2 g7g5 f4e3 g8h6 g1f3 f7f6 h2h4 g5g4 f3h2 h8g8 d1b1 d8e7 g2g3 a7a6 f1g2 h6f5 d2f1 d7b6 e3f4 b6a4 b1c2 b7b5 e2e4 e6e5 f1e3 e5f4 e3d5 e7d6 d5f4 d6e7 e1g1 f5d6 f1e1 e8d7 ...
+game 61/100: our_color=W result=0-1 plies=130 W-L-D=2-49-10 elapsed=196.2s avg=3.2s/game eta=125.4s
+game 62/100: our_color=B result=1-0 plies=113 W-L-D=2-50-10 elapsed=200.7s avg=3.2s/game eta=123.0s
+game 63/100: our_color=W result=0-1 plies=212 W-L-D=2-51-10 elapsed=204.2s avg=3.2s/game eta=119.9s
+game 64/100: our_color=B result=1-0 plies=77 W-L-D=2-52-10 elapsed=208.9s avg=3.3s/game eta=117.5s
+game 65/100: our_color=W result=0-1 plies=76 W-L-D=2-53-10 elapsed=211.2s avg=3.2s/game eta=113.7s
+game 66/100: our_color=B result=1-0 plies=55 W-L-D=2-54-10 elapsed=213.4s avg=3.2s/game eta=109.9s
+game 67/100: our_color=W result=0-1 plies=194 W-L-D=2-55-10 elapsed=216.5s avg=3.2s/game eta=106.6s
+game 68/100: our_color=B result=1-0 plies=175 W-L-D=2-56-10 elapsed=220.1s avg=3.2s/game eta=103.6s
+game 69/100: our_color=W result=0-1 plies=102 W-L-D=2-57-10 elapsed=223.7s avg=3.2s/game eta=100.5s
+game 70/100: our_color=B result=1-0 plies=141 W-L-D=2-58-10 elapsed=229.6s avg=3.3s/game eta=98.4s
+sample game 70: plies=141 moves=e2e4 g8f6 e4e5 f6e4 c2c3 d7d5 d2d3 e4c5 c1e3 c5d7 g1f3 b8c6 d3d4 f7f6 f1b5 e8f7 c3c4 c6b4 a2a3 c7c6 b5a4 b4a6 c4d5 c6d5 d1e2 d7b6 a4b3 h7h6 h2h3 e7e6 b3a2 c8d7 a2b3 d7c6 e2d3 f8e7 e5f6 g7f6 f3h4 d8g8 ...
+game 71/100: our_color=W result=0-1 plies=68 W-L-D=2-59-10 elapsed=232.4s avg=3.3s/game eta=94.9s
+game 72/100: our_color=B result=0-1 plies=136 W-L-D=3-59-10 elapsed=234.8s avg=3.3s/game eta=91.3s
+game 73/100: our_color=W result=0-1 plies=120 W-L-D=3-60-10 elapsed=237.7s avg=3.3s/game eta=87.9s
+game 74/100: our_color=B result=1-0 plies=165 W-L-D=3-61-10 elapsed=243.6s avg=3.3s/game eta=85.6s
+game 75/100: our_color=W result=1-0 plies=77 W-L-D=4-61-10 elapsed=246.2s avg=3.3s/game eta=82.1s
+game 76/100: our_color=B result=1/2-1/2 plies=150 W-L-D=4-61-11 elapsed=249.3s avg=3.3s/game eta=78.7s
+game 77/100: our_color=W result=0-1 plies=84 W-L-D=4-62-11 elapsed=252.3s avg=3.3s/game eta=75.4s
+game 78/100: our_color=B result=1-0 plies=249 W-L-D=4-63-11 elapsed=258.2s avg=3.3s/game eta=72.8s
+game 79/100: our_color=W result=1-0 plies=115 W-L-D=5-63-11 elapsed=261.4s avg=3.3s/game eta=69.5s
+game 80/100: our_color=B result=1-0 plies=89 W-L-D=5-64-11 elapsed=265.4s avg=3.3s/game eta=66.4s
+sample game 80: plies=89 moves=e2e4 g8f6 b1c3 e7e6 e4e5 f6g8 d1g4 b8c6 d2d4 g8e7 f1b5 c6b4 g4e2 a7a6 b5d3 d7d6 g1f3 d8d7 d3c4 b4c6 a2a3 d6d5 c4b3 e7f5 e2d1 c6a5 c1d2 d7c6 h2h3 c8d7 b3a2 b7b6 c3e2 a5c4 d2c1 e8c8 g2g4 f5e7 e2f4 c4a5 ...
+game 81/100: our_color=W result=0-1 plies=66 W-L-D=5-65-11 elapsed=267.2s avg=3.3s/game eta=62.7s
+game 82/100: our_color=B result=1-0 plies=215 W-L-D=5-66-11 elapsed=269.8s avg=3.3s/game eta=59.2s
+game 83/100: our_color=W result=0-1 plies=198 W-L-D=5-67-11 elapsed=274.0s avg=3.3s/game eta=56.1s
+game 84/100: our_color=B result=1-0 plies=141 W-L-D=5-68-11 elapsed=277.0s avg=3.3s/game eta=52.8s
+game 85/100: our_color=W result=0-1 plies=70 W-L-D=5-69-11 elapsed=279.8s avg=3.3s/game eta=49.4s
+game 86/100: our_color=B result=1-0 plies=63 W-L-D=5-70-11 elapsed=283.0s avg=3.3s/game eta=46.1s
+game 87/100: our_color=W result=0-1 plies=48 W-L-D=5-71-11 elapsed=285.1s avg=3.3s/game eta=42.6s
+game 88/100: our_color=B result=1-0 plies=73 W-L-D=5-72-11 elapsed=287.4s avg=3.3s/game eta=39.2s
+game 89/100: our_color=W result=0-1 plies=122 W-L-D=5-73-11 elapsed=290.8s avg=3.3s/game eta=35.9s
+game 90/100: our_color=B result=1/2-1/2 plies=63 W-L-D=5-73-12 elapsed=293.9s avg=3.3s/game eta=32.7s
+sample game 90: plies=63 moves=e2e4 a7a6 g1f3 g8f6 b1c3 e7e5 a2a3 d7d6 f1c4 c8g4 d2d3 f8e7 e1g1 b8c6 h2h3 g4h5 g2g4 f6g4 h3g4 h5g4 c4f7 e8f7 f3g5 e7g5 d1g4 f7g6 f2f4 e5f4 c3e2 f4f3 e2f4 g6f7 f4h5 h7h6 g4f3 g5f6 c1e3 c6e5 f3g2 h8g8 ...
+game 91/100: our_color=W result=0-1 plies=248 W-L-D=5-74-12 elapsed=296.7s avg=3.3s/game eta=29.3s
+game 92/100: our_color=B result=1/2-1/2 plies=112 W-L-D=5-74-13 elapsed=299.8s avg=3.3s/game eta=26.1s
+game 93/100: our_color=W result=1-0 plies=91 W-L-D=6-74-13 elapsed=303.3s avg=3.3s/game eta=22.8s
+game 94/100: our_color=B result=1-0 plies=167 W-L-D=6-75-13 elapsed=308.0s avg=3.3s/game eta=19.7s
+game 95/100: our_color=W result=1-0 plies=193 W-L-D=7-75-13 elapsed=329.2s avg=3.5s/game eta=17.3s
+game 96/100: our_color=B result=1-0 plies=183 W-L-D=7-76-13 elapsed=338.3s avg=3.5s/game eta=14.1s
+game 97/100: our_color=W result=1/2-1/2 plies=147 W-L-D=7-76-14 elapsed=341.7s avg=3.5s/game eta=10.6s
+game 98/100: our_color=B result=1-0 plies=45 W-L-D=7-77-14 elapsed=343.3s avg=3.5s/game eta=7.0s
+game 99/100: our_color=W result=0-1 plies=90 W-L-D=7-78-14 elapsed=347.5s avg=3.5s/game eta=3.5s
+game 100/100: our_color=B result=1-0 plies=109 W-L-D=7-79-14 elapsed=351.7s avg=3.5s/game eta=0.0s
+sample game 100: plies=109 moves=e2e4 a7a6 d2d4 d7d5 e4d5 d8d5 c2c4 d5c6 c1f4 g8f6 g1f3 c6e4 f4e3 e4c6 b1d2 b8d7 f1e2 h7h5 h2h3 h5h4 e1g1 c6b6 f3g5 e7e6 d1c2 f8e7 a1d1 e8f8 c2c3 b6c6 b2b4 f6d5 c3b3 d5e3 b3e3 c6d6 a2a3 d6c6 d2f3 c6d6 ...
+
+Final W-L-D: 7-79-14 (100 games, score=0.140)
+Elo estimate (rustchess - opponent): -315.3
