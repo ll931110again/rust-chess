@@ -1,0 +1,16 @@
+FROM rust:1.86-bookworm AS builder
+WORKDIR /app
+COPY Cargo.toml Cargo.lock* ./
+RUN mkdir src && echo "fn main(){}" > src/main.rs && cargo build --release && rm -rf src
+COPY . .
+RUN cargo build --release
+
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --from=builder /app/target/release/qualitydocs-api /app/qualitydocs-api
+ENV DATABASE_URL=sqlite:/data/qualitydocs.db
+ENV PORT=8080
+EXPOSE 8080
+VOLUME ["/data"]
+CMD ["/app/qualitydocs-api"]

@@ -1,0 +1,88 @@
+@import "highlight.js/styles/github-dark.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0c0f14;
+  --surface: #141820;
+  --border: #252b36;
+  --text: #e8eaed;
+  --muted: #9aa3b2;
+  --accent: #6b9fff;
+  --accent-soft: #1a2744;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.prose-docs {
+  font-family: var(--font-serif), Georgia, serif;
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+.prose-docs h1,
+.prose-docs h2,
+.prose-docs h3 {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.prose-docs h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.prose-docs h2 {
+  font-size: 1.4rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.prose-docs code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9em;
+  background: var(--surface);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+}
+
+.prose-docs pre {
+  background: var(--surface) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.prose-docs table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.prose-docs th,
+.prose-docs td {
+  border: 1px solid var(--border);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+}
+
+.prose-docs th {
+  background: var(--surface);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #6b9fff 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
