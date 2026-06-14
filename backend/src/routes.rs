@@ -167,3 +167,19 @@ async fn call_openai(
         .unwrap_or("Unable to generate explanation.")
         .to_string())
 }
+
+pub async fn crawler_status() -> Json<crate::crawler::CrawlerStatus> {
+    Json(crate::crawler::status().await)
+}
+
+pub async fn crawler_run(
+    State(pool): State<SqlitePool>,
+) -> Result<Json<serde_json::Value>, StatusCode> {
+    let pool = pool.clone();
+    tokio::spawn(async move {
+        if let Err(e) = crate::crawler::run_once(&pool).await {
+            tracing::error!("Manual crawler run failed: {:#}", e);
+        }
+    });
+    Ok(Json(serde_json::json!({ "status": "started" })))
+}

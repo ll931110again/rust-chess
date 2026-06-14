@@ -1,3 +1,4 @@
+mod crawler;
 mod db;
 mod models;
 mod routes;
@@ -27,6 +28,7 @@ async fn main() -> anyhow::Result<()> {
 
     let pool = db::init_pool(&database_url).await?;
     seed::run_seed(&pool).await?;
+    crawler::spawn(pool.clone());
 
     let cors = CorsLayer::new()
         .allow_origin(Any)
@@ -38,6 +40,8 @@ async fn main() -> anyhow::Result<()> {
         .route("/api/documents", get(routes::list_documents))
         .route("/api/documents/:slug", get(routes::get_document))
         .route("/api/documents/:slug/explain", post(routes::explain_section))
+        .route("/api/crawler/status", get(routes::crawler_status))
+        .route("/api/crawler/run", post(routes::crawler_run))
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .with_state(pool);
