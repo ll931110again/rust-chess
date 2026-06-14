@@ -16,9 +16,10 @@ pub async fn init_pool(database_url: &str) -> anyhow::Result<SqlitePool> {
 }
 
 async fn run_migrations(pool: &SqlitePool) -> anyhow::Result<()> {
-    let migration = include_str!("../migrations/001_init.sql");
-    for statement in migration.split(';').map(str::trim).filter(|s| !s.is_empty()) {
-        sqlx::query(statement).execute(pool).await?;
+    for migration in [include_str!("../migrations/001_init.sql"), include_str!("../migrations/002_crawler.sql")] {
+        for statement in migration.split(';').map(str::trim).filter(|s| !s.is_empty()) {
+            sqlx::query(statement).execute(pool).await?;
+        }
     }
 
     sqlx::query(
@@ -26,6 +27,15 @@ async fn run_migrations(pool: &SqlitePool) -> anyhow::Result<()> {
     )
     .execute(pool)
     .await?;
+
+    let triggers = [
+        "CREATE TRIGGER IF NOT EXISTS pages_ai AFTER INSERT ON pages BEGIN INSERT INTO pages_fts(rowid, title, content) VALUES (new.id, new.title, new.content); END",
+        "CREATE TRIGGER IF NOT EXISTS pages_ad AFTER DELETE ON pages BEGIN INSERT INTO pages_fts(pages_fts, rowid, title, content) VALUES('delete', old.id, old.title, old.content); END",
+        "CREATE TRIGGER IF NOT EXISTS pages_au AFTER UPDATE ON pages BEGIN INSERT INTO pages_fts(pages_fts, rowid, title, content) VALUES('delete', old.id, old.title, old.content); INSERT INTO pages_fts(rowid, title, content) VALUES (new.id, new.title, new.content); END",
+    ];
+    for t in triggers {
+        sqlx::query(t).execute(pool).await?;
+    }
 
     Ok(())
 }
