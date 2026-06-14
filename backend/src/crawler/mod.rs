@@ -42,7 +42,7 @@ pub fn spawn(pool: SqlitePool) {
         .unwrap_or(900);
 
     tokio::spawn(async move {
-        tokio::time::sleep(Duration::from_secs(10)).await;
+        tokio::time::sleep(Duration::from_secs(120)).await;
         loop {
             if let Err(e) = run_once(&pool).await {
                 error!("Crawler run failed: {:#}", e);
